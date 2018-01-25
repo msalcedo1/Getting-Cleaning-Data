@@ -27,12 +27,10 @@ y_train <- read.table("UCI HAR Dataset/train/y_train.txt")
 activity_labels <- read.table("UCI HAR Dataset/activity_labels.txt")
 
 
-
-#### Excercice 1 
 #### Just merge training set and the test set to create one data set.
 dataSet <- rbind(X_train,X_test)
 
-#### Excercice 2
+
 #### Extracts only the measurements on the mean and standard deviation for each measurement. 
 # Use vector of mean and std, use the vector to subset.
 features <- read.table("UCI HAR Dataset/features.txt")  
@@ -40,7 +38,6 @@ MeanStd <- grep("mean()|std()", features[, 2])
 dataSet <- dataSet[,MeanStd]
 
 
-#### Excercice 4
 #### Appropriately labels the data set with descriptive activity names.
 # Create vector of "Clean" feature names by getting rid of "()" apply to the dataSet to rename labels.
 CleanFeatureNames <- sapply(features[, 2], function(x) {gsub("[()]", "",x)})
@@ -56,15 +53,14 @@ names(activity) <- 'activity'
 dataSet <- cbind(subject,activity, dataSet)
 
 
-# 3. Uses descriptive activity names to name the activities in the data set
+#### Uses descriptive activity names to name the activities in the data set
 # group the activity column of dataSet, re-name lable of levels with activity_levels, and apply it to dataSet.
 act_group <- factor(dataSet$activity)
 levels(act_group) <- activity_labels[,2]
 dataSet$activity <- act_group
 
 
-# 5. Creates a second, independent tidy data set with the average of each variable for each activity and each subject. 
-
+#### Creates a second, independent tidy data set with the average of each variable for each activity and each subject. 
 # check if reshape2 package is installed
 if (!"reshape2" %in% installed.packages()) {
       install.packages("reshape2")
