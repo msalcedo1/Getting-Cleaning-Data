@@ -3,6 +3,8 @@
 Overview
 30 volunteers performed 6 different activities while wearing a smartphone. The smartphone captured various data about their movements.
 
+
+
 Explanation of each file
 - features.txt: Names of the 561 features.
 - activity_labels.txt: Names and IDs for each of the 6 activities.
@@ -30,22 +32,20 @@ Then, the useful data from every txt file is stored into a variable:
 
 ## Excercice 2
 First creates a vector of only mean and std labels, then use the vector to subset dataSet.
-* dataSet : dataSet will only contain mean and std variables
+* features: reads feature table from data
+* feature_id: selects only Mean or Std features
+* MeanStd: dataset used to store feature_id's
 
 ## Excercice 3
 Create a vector of "clean" feature names by getting rid of "()" at the end. Then, will apply that to the dataSet to rename column labels.
-* CleanFeatureNames : a vector of "clean" feature names 
+* Act_names: stores the activity labels
 
 ## Excercice 4
 Combine test data and train data of subject and activity, then give descriptive lables. Finally, bind with dataSet. At the end of this step, dataSet has 2 additonal columns 'subject' and 'activity' in the left side.
-* subject : bind of subject_train and subject_test
-* activity : bind of y_train and y_test
+* Replace or remove some characters or strings from name labels
+
 
 ## Excercice 5
 Group the activity column of dataSet as "act_group", then rename each levels with 2nd column of activity_levels. Finally apply the renamed "act_group" to dataSet's activity column.
-* act_group : factored activity column of dataSet 
+* Tidy_finalSet: creates the final dataset by grouping MeanStd by Subject and Activity and then sumarizes it. 
 
-## Excercice 6
-In this part, dataSet is melted to create tidy data. It will also add [mean of] to each column labels for better description. Finally output the data as "tidy_data.txt" stored on your wd.
-* baseData : melted tall and skinny dataSet
-* secondDataSet : casete baseData which has means of each variables

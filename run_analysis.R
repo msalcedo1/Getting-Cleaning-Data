@@ -1,4 +1,5 @@
 #### Getting and Cleaning Data Course Project
+library(dplyr)
 
 #### download and uzip 
 fileName <- "UCIdata.zip"
@@ -16,60 +17,51 @@ if(!file.exists(dir)){
 }
 
 #### Reading Data
+# Subject files
 subject_test <- read.table("UCI HAR Dataset/test/subject_test.txt")
 subject_train <- read.table("UCI HAR Dataset/train/subject_train.txt")
+### Fearures files
 X_test <- read.table("UCI HAR Dataset/test/X_test.txt")
 X_train <- read.table("UCI HAR Dataset/train/X_train.txt")
+### Activity files
 y_test <- read.table("UCI HAR Dataset/test/y_test.txt")
 y_train <- read.table("UCI HAR Dataset/train/y_train.txt")
 
-#### Labels
-activity_labels <- read.table("UCI HAR Dataset/activity_labels.txt")
+# Excercice 1
+#### merge training set and the test set to create one data set.
+# dataSet <- rbind(X_train,X_test)
+dataSet <- cbind(rbind(subject_train,subject_test),rbind(y_train,y_test),rbind(X_train,X_test))
 
-
-#### Just merge training set and the test set to create one data set.
-dataSet <- rbind(X_train,X_test)
-
-
+# Excercice 2
 #### Extracts only the measurements on the mean and standard deviation for each measurement. 
 # Use vector of mean and std, use the vector to subset.
-features <- read.table("UCI HAR Dataset/features.txt")  
-MeanStd <- grep("mean()|std()", features[, 2]) 
-dataSet <- dataSet[,MeanStd]
+features <- read.table("UCI HAR Dataset/features.txt", stringsAsFactors = FALSE)[,2]
+feature_id <- grep(("mean\\(\\)|std\\(\\)"), features)
+MeanStd <- dataSet[, c(1, 2, feature_id+2)]
+colnames(MeanStd) <- c("Subject", "Activity", features[feature_id])
 
 
-#### Appropriately labels the data set with descriptive activity names.
-# Create vector of "Clean" feature names by getting rid of "()" apply to the dataSet to rename labels.
-CleanFeatureNames <- sapply(features[, 2], function(x) {gsub("[()]", "",x)})
-names(dataSet) <- CleanFeatureNames[MeanStd]
-
-# combine test and train of subject data and activity data, give descriptive lables
-subject <- rbind(subject_train, subject_test)
-names(subject) <- 'subject'
-activity <- rbind(y_train, y_test)
-names(activity) <- 'activity'
-
-# combine subject, activity, and mean and std only data set to create final data set.
-dataSet <- cbind(subject,activity, dataSet)
-
-
+# Excercice 3
 #### Uses descriptive activity names to name the activities in the data set
 # group the activity column of dataSet, re-name lable of levels with activity_levels, and apply it to dataSet.
-act_group <- factor(dataSet$activity)
-levels(act_group) <- activity_labels[,2]
-dataSet$activity <- act_group
+Act_names <- read.table("UCI HAR Dataset/activity_labels.txt")
 
-
-#### Creates a second, independent tidy data set with the average of each variable for each activity and each subject. 
-# check if reshape2 package is installed
-if (!"reshape2" %in% installed.packages()) {
-      install.packages("reshape2")
+for (i in 1:6){
+      MeanStd$Activity[MeanStd$Activity == i] <- as.character(Act_names[i,2])
 }
-library("reshape2")
 
-# melt data to tall skinny data and cast means. Finally write the tidy data to the working directory as "tidy_data.txt"
-baseData <- melt(dataSet,(id.vars=c("subject","activity")))
-secondDataSet <- dcast(baseData, subject + activity ~ variable, mean)
-names(secondDataSet)[-c(1:2)] <- paste("[mean of]" , names(secondDataSet)[-c(1:2)] )
-write.table(secondDataSet, "tidy_data.txt", sep = ",")
+# Excercice 4
+#### Appropriately labels the data set with descriptive activity names.
+# Create vector of "Clean" feature names by getting rid of "()" apply to the dataSet to rename labels.
+# CleanFeatureNames <- sapply(features[, 2], function(x) {gsub("[()]", "",x)})
+# names(dataSet) <- CleanFeatureNames[MeanStd]
+names(MeanStd) <- gsub("\\()", "", names(MeanStd))
+names(MeanStd) <- gsub("^t", "time_", names(MeanStd))
+names(MeanStd) <- gsub("^f", "freq_", names(MeanStd))
+names(MeanStd) <- gsub("BodyBody", "Body", names(MeanStd))
 
+# Excercice 5
+# From the data set in step 4, creates a second, 
+# independent tidy data set with the average of each variable for each activity and each subject.
+Tidy_finalSet <- MeanStd %>% group_by(Subject, Activity) %>% summarise_all(.funs = c(mean="mean"))
+write.table(Tidy_finalSet, "tidy_data.txt", row.names = FALSE)
