@@ -25,7 +25,7 @@ y_train <- read.table("UCI HAR Dataset/train/y_train.txt")
 
 #### Labels
 activity_labels <- read.table("UCI HAR Dataset/activity_labels.txt")
-features <- read.table("UCI HAR Dataset/features.txt")  
+
 
 
 #### Excercice 1 
@@ -35,6 +35,7 @@ dataSet <- rbind(X_train,X_test)
 #### Excercice 2
 #### Extracts only the measurements on the mean and standard deviation for each measurement. 
 # Use vector of mean and std, use the vector to subset.
+features <- read.table("UCI HAR Dataset/features.txt")  
 MeanStd <- grep("mean()|std()", features[, 2]) 
 dataSet <- dataSet[,MeanStd]
 
